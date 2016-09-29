@@ -73,13 +73,7 @@ public class EnvelopeFactory {
         log = Logger.getLogger(LogDomainConstants.SOAP_DOMAIN,
         "com.sun.xml.messaging.saaj.soap.LocalStrings");
     
-    private static ContextClassloaderLocal<ParserPool> parserPool =
-            new ContextClassloaderLocal<ParserPool>() {
-                @Override
-                protected ParserPool initialValue() throws Exception {
-                    return new ParserPool(5);
-                }
-            };
+    private static final ParserPool parserPool = new ParserPool(5);
 
     public static Envelope createEnvelope(Source src, SOAPPartImpl soapPart)
         throws SOAPException 
@@ -152,7 +146,7 @@ public class EnvelopeFactory {
         SAXParser saxParser = null;
         if (src instanceof StreamSource) {
             try {
-                saxParser = parserPool.get().get();
+                saxParser = parserPool.get();
             } catch (Exception e) {
                 log.severe("SAAJ0601.util.newSAXParser.exception");
                 throw new SOAPExceptionImpl(
@@ -193,7 +187,7 @@ public class EnvelopeFactory {
                 ex);
         } finally {
             if (saxParser != null) {
-                parserPool.get().returnParser(saxParser);
+                parserPool.returnParser(saxParser);
             }
         }
     }
